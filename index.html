@@ -7,6 +7,8 @@
 
             .tab {
                 overflow: hidden;
+
+                margin-left: 1%;
                 border: 1px solid #ccc;
                 background-color: #f1f1f1;
             }
@@ -24,7 +26,7 @@
 
             .tab button:hover {
                 background-color: #ddd;
-                padding: 1% 12px;
+                padding: 1% 1%;
             }
 
             .tab button.active {
@@ -32,8 +34,9 @@
             }
 
             .tabcontent {
-                display: none;
-                padding: 300px 12px;
+                display:none;
+                margin-left: 1%;
+                width: 60vw;
                 border: 1px solid #ccc;
                 border-top: none;
             }
@@ -41,7 +44,8 @@
     </head>
 
     <body>
-        <p>Выберите алгоритм:</p>
+
+        <div style="margin-top: 3%; margin-left: 1%;">Выберите алгоритм:</div>
 
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, '0')">А*</button>
@@ -53,29 +57,38 @@
         </div>
 
         <div id="0" class="tabcontent">
+            <canvas id = "canvas0"></canvas>
             <script src="/scripts/A_star/A_star.js"></script>
         </div>
 
         <div id="1" class="tabcontent">
+            <canvas id = "canvas1"></canvas>
             <script src="/scripts/clustering_algorithm/clustering_algorithm.js"></script>
         </div>
 
         <div id="2" class="tabcontent">
             <script src="/scripts/genetic_algorithm/genetic_algorithm.js"></script>
+            <canvas id = "canvas2"></canvas>
+
         </div>
 
         <div id="3" class="tabcontent">
             <script src="/scripts/ant_algorithm/ant_algorithm.js"></script>
+            <canvas id = "canvas3", style="height: 40vw;"></canvas>
+
         </div>
 
         <div id="4" class="tabcontent">
             <script src="/scripts/decision_tree/decision_tree.js"></script>
+            <canvas id = "canvas4", style="height: 40vw;"></canvas>
+
         </div>
 
         <div id="5" class="tabcontent">
             <script src="/scripts/neural_network/neural_network.js"></script>
+            <canvas id = "canvas5", style="height: 40vw;"></canvas>
         </div>
-
+        
         <script>
             function openCity(evt, cityName) {
                 var i, tabcontent, tablinks;
@@ -87,7 +100,7 @@
                 for (i = 0; i < tablinks.length; i++) {
                     tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }
-                document.getElementById(cityName).style.display = "block";
+                document.getElementById(cityName).style.display = "inline-block";
                 evt.currentTarget.className += " active";
             }
         </script>
