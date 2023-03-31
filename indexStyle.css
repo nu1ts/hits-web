@@ -1,32 +1,44 @@
 body {font-family: Arial;}
 
+
 .tab {
     overflow: hidden;
+    border: 2px solid #000000;
+    background-color: #7db8ff;
     text-align: center;
 }
-
 .tab button {
     background-color: inherit;
+
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 14px 16px;
+    padding: 1vw 1vw;
     transition: 0.3s;
-    font-size: 16px;
+    font-size: 18px;
+    font-family: 'Cuprum', sans-serif;
+    
 }
-
 .tab button:hover {
-    padding: 1% 1%;
+    background-color: #60a8ff;
+    padding-left:1%;
+}
+.tab button.active {
+    background-color: #60a8ff;
 }
 
 .tabcontent {
-    position: relative;
-    border: 1% solid #f3f3f3;
-    display: none;
+    display:none;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60vw;
+    background-color: #ffffff;
+    border: 2px solid #000000;
+    border-top: none;
 }
 
 .tabcontent button.runbutton {
     position: absolute;
-    bottom: 1%;
-    right: 1%;
+    bottom: 5%;
+    right: 3%;
 }

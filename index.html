@@ -3,7 +3,12 @@
     <head>
         <meta charset="UTF-8">
 
-        <link rel="stylesheet" href="indexStyle.css" type="text/css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cuprum:wght@700&display=swap" rel="stylesheet"> 
+        
+        <link rel="stylesheet" href="indexStyle.css" type="text/css"></link>
+        
 
         <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
         <script src="/scripts/aStar/aStar.js"></script>
@@ -14,12 +19,12 @@
 
     <body>
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, '0')">А*</button>
-            <button class="tablinks" onclick="openTab(event, '1')">Алгоритм кластеризации</button>
-            <button class="tablinks" onclick="openTab(event, '2')">Генетический алгоритм</button>
-            <button class="tablinks" onclick="openTab(event, '3')">Муравьиный алгоритм</button>
-            <button class="tablinks" onclick="openTab(event, '4')">Дерево решений</button>
-            <button class="tablinks" onclick="openTab(event, '5')">Нейронная сеть</button>
+            <button class="tablinks" onclick="openTab(event, '0')"><font color="white">А*</font></button>
+            <button class="tablinks" onclick="openTab(event, '1')"><font color="white">Алгоритм кластеризации</font></button>
+            <button class="tablinks" onclick="openTab(event, '2')"><font color="white">Генетический алгоритм</font></button>
+            <button class="tablinks" onclick="openTab(event, '3')"><font color="white">Муравьиный алгоритм</font></button>
+            <button class="tablinks" onclick="openTab(event, '4')"><font color="white">Дерево решений</font></button>
+            <button class="tablinks" onclick="openTab(event, '5')"><font color="white">Нейронная сеть</font></button>
         </div>
 
         <div id="0" class="tabcontent">
@@ -58,7 +63,7 @@
                 for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }   
-                document.getElementById(algorithmName).style.display = "block";
+                document.getElementById(algorithmName).style.display = "inline-block";
                 evt.currentTarget.className += " active";
             }
         </script>
