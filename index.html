@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="indexStyle.css" type="text/css"></link>
 
         <link rel="stylesheet" href="/scripts/aStar/aStarStyle.css" type="text/css">
+        <link rel="stylesheet" href="/scripts/clusteringAlgorithm/clusteringAlgorithm.css" type="text/css">
 
         <!-- scripts -->
         <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
@@ -23,19 +24,22 @@
     <body>
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'astar')"><font color="white">А*</font></button>
-            <button class="tablinks" onclick="openTab(event, '1')"><font color="white">Алгоритм кластеризации</font></button>
+            <button class="tablinks" onclick="openTab(event, 'clusteringAlg')"><font color="white">Алгоритм кластеризации</font></button>
             <button class="tablinks" onclick="openTab(event, '2')"><font color="white">Генетический алгоритм</font></button>
             <button class="tablinks" onclick="openTab(event, '3')"><font color="white">Муравьиный алгоритм</font></button>
             <button class="tablinks" onclick="openTab(event, '4')"><font color="white">Дерево решений</font></button>
             <button class="tablinks" onclick="openTab(event, '5')"><font color="white">Нейронная сеть</font></button>
         </div>
 
-        <div id="astar" class="tab-content">
-            <button class="button-run" onclick="run()">Запустить</button>
+        <div id="astar" class="tab-content", style="background-color: rgb(182, 219, 234);">
+            <button class="button-run" onclick="run()"><font color="white">Запустить</font></button>
+            <canvas id = "canvas0", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);"></canvas>
+            <script src="/scripts/aStar/aStar.js"></script>
         </div>
 
-        <div id="1" class="tab-content">
-            <canvas id = "canvas1"></canvas>
+        <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
+            <button class="button-run" onclick="run()"><font color="white">Запустить</font></button>
+            <canvas id = "canvas1", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);"></canvas>
             <script src="/scripts/clusteringAlgorithm/clusteringAlgorithm.js"></script>
         </div>
 
@@ -69,7 +73,7 @@
                     tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }   
 
-                document.getElementById(algorithmName).style.display = "block";
+                document.getElementById(algorithmName).style.display = "inline-block";
                 evt.currentTarget.className += " active";
             }
         </script>

@@ -5,8 +5,8 @@ function windowToCanvas(canvas, x, y) {
 
 var canvas = document.getElementById("canvas1");
     ctx     = canvas.getContext('2d');
-canvas.width = document.documentElement.clientWidth*0.6;
-canvas.height = document.documentElement.clientHeight*0.6;
+canvas.width = document.documentElement.clientWidth*0.9905;
+canvas.height = document.documentElement.clientHeight*0.85;
 
 canvas.addEventListener('mousedown',
 function(e) {

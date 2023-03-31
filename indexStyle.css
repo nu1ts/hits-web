@@ -29,9 +29,14 @@ body {
     padding-right: 1rem;
     font-size: 1.3rem;
 }
+
+.tab button.active {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 1.3rem;
+}
   
 .tab-content {
-    background-color: #fff;
     border: 2px solid #000;
     border-top: none;
     display: none;
