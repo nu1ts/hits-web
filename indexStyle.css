@@ -2,42 +2,31 @@ body {font-family: Arial;}
 
 .tab {
     overflow: hidden;
-    margin-left: 1%;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
+    text-align: center;
 }
 
 .tab button {
     background-color: inherit;
-    float: left;
     border: none;
     outline: none;
     cursor: pointer;
     padding: 14px 16px;
     transition: 0.3s;
-    font-size: 17px;
+    font-size: 16px;
 }
 
 .tab button:hover {
-    background-color: #ddd;
     padding: 1% 1%;
-}
-
-.tab button.active {
-    background-color: #ccc;
 }
 
 .tabcontent {
     position: relative;
-    display:none;
-    margin-left: 1%;
-    width: 60vw;
-    border: 1px solid #ccc;
-    border-top: none;
+    border: 1% solid #f3f3f3;
+    display: none;
 }
 
 .tabcontent button.runbutton {
     position: absolute;
-    bottom: 5%;
-    right: 3%;
+    bottom: 1%;
+    right: 1%;
 }

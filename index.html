@@ -23,8 +23,7 @@
         </div>
 
         <div id="0" class="tabcontent">
-            <canvas id = "canvas0"></canvas>
-            <button class="runbutton" onclick="run()">Выполнить</button>
+            
         </div>
 
         <div id="1" class="tabcontent">
@@ -33,22 +32,19 @@
         </div>
 
         <div id="2" class="tabcontent">
-            <canvas id = "canvas2"></canvas>
 
         </div>
 
         <div id="3" class="tabcontent">
-            <canvas id = "canvas3", style="height: 40vw;"></canvas>
 
         </div>
 
         <div id="4" class="tabcontent">
-            <canvas id = "canvas4", style="height: 40vw;"></canvas>
 
         </div>
 
         <div id="5" class="tabcontent">
-            <canvas id = "canvas5", style="height: 40vw;"></canvas>
+
         </div>
         
         <script>
@@ -56,13 +52,13 @@
                 var i, tabcontent, tablinks;
                 tabcontent = document.getElementsByClassName("tabcontent");
                 for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
+                tabcontent[i].style.display = "none";
                 }
                 tablinks = document.getElementsByClassName("tablinks");
                 for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].className = tablinks[i].className.replace(" active", "");
-                }
-                document.getElementById(algorithmName).style.display = "inline-block";
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }   
+                document.getElementById(algorithmName).style.display = "block";
                 evt.currentTarget.className += " active";
             }
         </script>
