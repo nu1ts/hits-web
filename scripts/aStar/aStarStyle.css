@@ -1,0 +1,14 @@
+#astar {
+    background-color: #fff;
+    border: 2px solid #000;
+    border-top: none;
+    display: none;
+    min-height: 48vw;
+    position: relative;
+}
+
+#astar button.button-run {
+    position: absolute;
+    bottom: 1%;
+    right: 1%;
+}

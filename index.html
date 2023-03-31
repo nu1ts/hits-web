@@ -3,13 +3,16 @@
     <head>
         <meta charset="UTF-8">
 
+        <!-- css links -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cuprum:wght@700&display=swap" rel="stylesheet"> 
-        
-        <link rel="stylesheet" href="indexStyle.css" type="text/css"></link>
-        
 
+        <link rel="stylesheet" href="indexStyle.css" type="text/css"></link>
+
+        <link rel="stylesheet" href="/scripts/aStar/aStarStyle.css" type="text/css">
+
+        <!-- scripts -->
         <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
         <script src="/scripts/aStar/aStar.js"></script>
         <script src="/scripts/decisionTree/decisionTree.js"></script>
@@ -19,7 +22,7 @@
 
     <body>
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, '0')"><font color="white">А*</font></button>
+            <button class="tablinks" onclick="openTab(event, 'astar')"><font color="white">А*</font></button>
             <button class="tablinks" onclick="openTab(event, '1')"><font color="white">Алгоритм кластеризации</font></button>
             <button class="tablinks" onclick="openTab(event, '2')"><font color="white">Генетический алгоритм</font></button>
             <button class="tablinks" onclick="openTab(event, '3')"><font color="white">Муравьиный алгоритм</font></button>
@@ -27,43 +30,46 @@
             <button class="tablinks" onclick="openTab(event, '5')"><font color="white">Нейронная сеть</font></button>
         </div>
 
-        <div id="0" class="tabcontent">
-            
+        <div id="astar" class="tab-content">
+            <button class="button-run" onclick="run()">Запустить</button>
         </div>
 
-        <div id="1" class="tabcontent">
+        <div id="1" class="tab-content">
             <canvas id = "canvas1"></canvas>
             <script src="/scripts/clusteringAlgorithm/clusteringAlgorithm.js"></script>
         </div>
 
-        <div id="2" class="tabcontent">
+        <div id="2" class="tab-content">
 
         </div>
 
-        <div id="3" class="tabcontent">
+        <div id="3" class="tab-content">
 
         </div>
 
-        <div id="4" class="tabcontent">
+        <div id="4" class="tab-content">
 
         </div>
 
-        <div id="5" class="tabcontent">
+        <div id="5" class="tab-content">
 
         </div>
         
         <script>
             function openTab(evt, algorithmName) {
-                var i, tabcontent, tablinks;
-                tabcontent = document.getElementsByClassName("tabcontent");
-                for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+                var i, tabContent, tablinks;
+
+                tabContent = document.getElementsByClassName("tab-content");
+                for (i = 0; i < tabContent.length; i++) {
+                    tabContent[i].style.display = "none";
                 }
+
                 tablinks = document.getElementsByClassName("tablinks");
                 for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }   
-                document.getElementById(algorithmName).style.display = "inline-block";
+
+                document.getElementById(algorithmName).style.display = "block";
                 evt.currentTarget.className += " active";
             }
         </script>
