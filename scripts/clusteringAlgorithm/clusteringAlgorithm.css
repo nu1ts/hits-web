@@ -26,3 +26,18 @@ button:hover {
     padding-right: 1rem;
     font-size: 1.3rem;
 }
+
+#clusteringAlg .K{
+    position: absolute;
+    bottom: 1vw;
+    right: 10vw;
+    text-align: center;
+    background-color: #7db8ff;
+    transition: padding 0.3s;
+    transition: font-size 0.3s ease-in-out;
+    border: 2px solid #000;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: 'Cuprum', sans-serif;
+    width: 2vw;
+}

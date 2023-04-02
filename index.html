@@ -38,9 +38,11 @@
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
-            <button class="button-run" onclick="run()"><font color="white">Запустить</font></button>
+            <button class="button-run" onclick="runClusteringAlg()"><font color="white">Запустить</font></button>
             <canvas id = "canvas1", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);"></canvas>
             <script src="/scripts/clusteringAlgorithm/clusteringAlgorithm.js"></script>
+            <input class = 'K' id = 'K' type="text", style="color: white"></input>
+            <p, style="position: absolute; bottom: 0.3vw; right: 13vw; font-size: 1rem; font-family: 'Cuprum', sans-serif;">Введите значение K:</p>
         </div>
 
         <div id="2" class="tab-content">
