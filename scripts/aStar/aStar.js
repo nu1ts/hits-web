@@ -1,48 +1,42 @@
+const CELL_SIZE  = 20;
+let maze = [];
+
+window.addEventListener('load', function() {
+  let divContainer = document.getElementById('astar-div');
+  let newCanvas = document.createElement('canvas');
+  newCanvas.setAttribute('id', 'astar-canvas');
+  newCanvas.width = 
+  divContainer.appendChild(newCanvas);
+});
+
 class Cell {
-    constructor(x, y, isOccupied) {
-      this.x = x;
-      this.y = y;
-      this.isOccupied = isOccupied;
-    }
-
-    makeWall() {
-      var canvas = document.getElementById("astar-canvas");
-      var ctx = canvas.getContext("2d");
-      var wall = new Image();
-      wall.onload = function() {
-        ctx.drawImage(wall, this.x, this.y, this.x, this.y);
-      }
-      wall.src = 'images/wall.png';
-    }
-}
-
-class Point {
-  constructor(x, y) {
+  constructor(x, y, isOccupied) {
     this.x = x;
     this.y = y;
+    this.isOccupied = isOccupied;
+    this.wallImage = new Image();
+    this.wallImage.src = 'images/BrickGrey.png';
+  }
+
+  makeWall() {
+    const xPos = this.x * CELL_SIZE;
+    const yPos = this.y * CELL_SIZE;
+    if (this.isOccupied == false) {
+      const aStarCanvas = document.getElementById("astar-canvas");
+      const ctx = aStarCanvas.getContext("2d");
+      ctx.drawImage(this.wallImage, xPos, yPos, CELL_SIZE, CELL_SIZE);
+    }
   }
 }
 
-window.addEventListener('load', function() {
-  var divContainer = document.getElementById('astar');
-  var canvas = document.createElement('canvas');
-  canvas.setAttribute('id', 'astar-canvas');
-  divContainer.appendChild(canvas);
-});
-
-function clearCell(x, y, width, height) {
-  
-}
-
-function createMap(width, height) {
-  let map = new Array(width);
-  let cellWidth = width * 30 / 100;
-  let cellHeight = height * 30 / 100;
-  for (let x = 0; x < width; x + cellWidth) {
-    map[x] = new Array(height);
-    for (let y = 0; y < height; y + cellHeight) {
-      map[x][y] = new Cell(x, y, true);
-      map[x][y].makeWall();
+function createMaze(MAZE_WIDTH, MAZE_HEIGHT) {
+  for (let y = 0; y < MAZE_HEIGHT; y++) {
+    let row = [];
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      const cell = new Cell(x, y, false);
+      row.push(cell);
+      cell.makeWall();
     }
+    maze.push(row);
   }
 }
