@@ -41,3 +41,13 @@ button:hover {
     font-family: 'Cuprum', sans-serif;
     width: 2vw;
 }
+
+#canvas1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 93.5%;
+    border-bottom: 2px solid #000;
+    background-color: rgb(255, 255, 255);
+}

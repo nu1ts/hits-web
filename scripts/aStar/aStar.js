@@ -1,61 +1,42 @@
-class Cell {
-    constructor(x, y, isOccupied) {
-      this.x = x;
-      this.y = y;
-      this.isOccupied = isOccupied;
-    }
-}
+const CELL_SIZE  = 20;
+let maze = [];
 
-class Point {
-  constructor(x, y) {
+window.addEventListener('load', function() {
+  let divContainer = document.getElementById('astar-div');
+  let newCanvas = document.createElement('canvas');
+  newCanvas.setAttribute('id', 'astar-canvas');
+  newCanvas.width = 
+  divContainer.appendChild(newCanvas);
+});
+
+class Cell {
+  constructor(x, y, isOccupied) {
     this.x = x;
     this.y = y;
+    this.isOccupied = isOccupied;
+    this.wallImage = new Image();
+    this.wallImage.src = 'images/BrickGrey.png';
+  }
+
+  makeWall() {
+    const xPos = this.x * CELL_SIZE;
+    const yPos = this.y * CELL_SIZE;
+    if (this.isOccupied == false) {
+      const aStarCanvas = document.getElementById("astar-canvas");
+      const ctx = aStarCanvas.getContext("2d");
+      ctx.drawImage(this.wallImage, xPos, yPos, CELL_SIZE, CELL_SIZE);
+    }
   }
 }
 
-function makeWall(x, y, width, height) {
-  window.addEventListener('load', () => {
-    let canvas = document.getElementById('astar-canvas');
-    let ctx = canvas.getContext('2d');
-
-    let wall = new Image();
-    wall.src = 'images/wall.png';
-
-    wall.onload = function() {
-      ctx.drawImage(wall, x, y, width, height);
+function createMaze(MAZE_WIDTH, MAZE_HEIGHT) {
+  for (let y = 0; y < MAZE_HEIGHT; y++) {
+    let row = [];
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      const cell = new Cell(x, y, false);
+      row.push(cell);
+      cell.makeWall();
     }
-  });
-}
-
-function clearCell(x, y, width, height) {
-
-}
-
-function createMap(width, height) {
-    let map = new Array(width);
-    for (let w = 0; w < width; w++) {
-      map[w] = new Array(height);
-      for (let h = 0; h < height; h++) {
-        map[w][h] = new Cell(w, h, false);
-        makeWall(0, 0, w, h);
-      }
-    }
-
-    let x = Math.floor(Math.random() * width / 2) * 2 + 1;
-    let y = Math.floor(Math.random() * height / 2) * 2 + 1;
-    clearCell();
-
-    let to_check = new Array();
-    if (y - 2 >= 0) {
-        to_check.push(new Point(x, y - 2));
-    }
-    if (y + 2 < height) {
-        to_check.push(new Point(x, y + 2));
-    }
-    if (x - 2 >= 0) {
-        to_check.push(new Point(x - 2, y));
-    }
-    if (x + 2 < width) {
-        to_check.push(new Point(x + 2, y));
-    }
+    maze.push(row);
+  }
 }
