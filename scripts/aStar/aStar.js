@@ -1,113 +1,153 @@
-const CELL_SIZE  = 16;
-let maze = [];
-
+//canvas creation
 window.addEventListener('load', function() {
   const divContainer = document.getElementById('astar-div');
   const newCanvas = document.createElement('canvas');
   newCanvas.setAttribute('id', 'astar-canvas');
   divContainer.appendChild(newCanvas);
 });
-
-//CLASSES
-class Cell {
-  constructor(x, y, isClear) {
+//
+//------------------------------------------
+//constants
+const CELL_SIZE  = 16;
+const MAZE_WIDTH = 69;
+const  MAZE_HEIGHT = 69;
+const INTERVAL_TIME = 10;
+let maze = [];
+//
+//------------------------------------------
+//images
+const WALL_IMAGE = new Image();
+WALL_IMAGE.src = 'images/Wall.png';
+const FLOOR_IMAGE = new Image();
+FLOOR_IMAGE.src = 'images/Floor.png';
+const SELECT_IMAGE = new Image();
+SELECT_IMAGE.src = 'images/Select.png';
+const WALL_3D = new Image();
+WALL_3D.src = 'images/3DWall.png';
+//
+//------------------------------------------
+//-------------------CODE-------------------
+//classes
+class Point {
+  constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.isClear = isClear;
-    this.wallImage = new Image();
-    this.wallImage.src = 'images/BlackWall.png';
-    this.floorImage = new Image();
-    this.floorImage.src = 'images/WhiteFloor.png';
-  }
-
-  makeWall() {
-    const X_POSITION = this.x * CELL_SIZE;
-    const Y_POSITION = this.y * CELL_SIZE;
-    if (this.isClear) {
-      const CANVAS = document.getElementById("astar-canvas");
-      const CTX = CANVAS.getContext("2d");
-      CTX.drawImage(this.wallImage, X_POSITION, Y_POSITION, CELL_SIZE, CELL_SIZE);
-      this.isClear = false;
-    }
-  }
-
-  clearCell() {
-    const X_POSITION = this.x * CELL_SIZE;
-    const Y_POSITION = this.y * CELL_SIZE;
-    const CANVAS = document.getElementById("astar-canvas");
-    const CTX = CANVAS.getContext("2d");
-    CTX.drawImage(this.floorImage, X_POSITION, Y_POSITION, CELL_SIZE, CELL_SIZE);
-    this.isClear = true;
   }
 }
-
-//MAP
-function createMaze(MAZE_WIDTH, MAZE_HEIGHT) {
+//
+//------------------------------------------
+//draw
+function draw(x, y) {
   const CANVAS = document.getElementById("astar-canvas");
-  CANVAS.width = CELL_SIZE * MAZE_WIDTH;
-  CANVAS.height = CELL_SIZE * MAZE_HEIGHT;
+  const CTX = CANVAS.getContext("2d");
+
+  CTX.save();
   
-  for (let y = 0; y < MAZE_HEIGHT; y++) {
-    let row = [];
-    for (let x = 0; x < MAZE_WIDTH; x++) {
-      const cell = new Cell(x, y, true);
-      cell.makeWall();
-      row.push(cell);
+  if(maze[x][y] != 2) {
+    if (maze[x][y] == 1) {
+      CTX.drawImage(FLOOR_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      if(maze[x][y - 1] == 0) {
+        CTX.drawImage(WALL_3D, x * CELL_SIZE, (y - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      }
+    } else {
+      CTX.drawImage(WALL_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     }
-    maze.push(row);
   }
-
-  let x = Math.floor(Math.random() * MAZE_WIDTH / 2) * 2 + 1;
-  let y = Math.floor(Math.random() * MAZE_HEIGHT / 2) * 2 + 1;
-  maze[x][y].clearCell();
-
-  let toCheck = [];
-  if (y - 2 >= 0) {
-    toCheck.push(new Cell(x, y - 2));
+  else {
+    CTX.drawImage(SELECT_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
-  if (y + 2 < MAZE_HEIGHT) {
-    toCheck.push(new Cell(x, y + 2));
-  }
-  if (x - 2 >= 0) {
-    toCheck.push(new Cell(x - 2, y));
-  }
-  if (x + 2 < MAZE_WIDTH) {
-    toCheck.push(new Cell(x + 2, y));
-  }
-
-  while (toCheck.length > 0) {
-    let index = Math.floor(Math.random() * toCheck.length);
-    let cell = toCheck[index];
-    let x = cell.x;
-    let y = cell.y;
-    maze[x][y].clearCell();
-    toCheck.splice(index, 1);
+  
+  CTX.restore();
+}
+//
+//------------------------------------------
+//map
+  function createMaze() {
+    const CANVAS = document.getElementById("astar-canvas");
+    CANVAS.width = CELL_SIZE * MAZE_WIDTH;
+    CANVAS.height = CELL_SIZE * MAZE_HEIGHT;
     
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      maze[x] = new Array(MAZE_HEIGHT);
+      for (let y = 0; y < MAZE_HEIGHT; y++) {
+        maze[x][y] = 0;
+        draw(x, y);
+      }
+    }
+
+    let x = Math.floor(Math.random() * MAZE_WIDTH / 2) * 2 + 1;
+    let y = Math.floor(Math.random() * MAZE_HEIGHT / 2) * 2 + 1;
+    maze[x][y] = 1;
+    draw(x, y);
+
+    let toCheck = [];
+    if (y - 2 >= 0) {
+      toCheck.push(new Point(x, y - 2));
+      maze[x][y - 2] = 2;
+    }
+    if (y + 2 < MAZE_HEIGHT) {
+      toCheck.push(new Point(x, y + 2));
+      maze[x][y + 2] = 2;
+    }
+    if (x - 2 >= 0) {
+      toCheck.push(new Point(x - 2, y));
+      maze[x - 2][y] = 2;
+    }
+    if (x + 2 < MAZE_WIDTH) {
+      toCheck.push(new Point(x + 2, y));
+      maze[x + 2][y] = 2;
+    }
+    toCheck.forEach(point => draw(point.x, point.y));
+    
+    let interval = setInterval(() => {
+      if (toCheck.length <= 0) {
+        clearInterval(interval);
+        return;
+      }
+  
+      let index = Math.floor(Math.random() * toCheck.length);
+      let randomPoint = toCheck[index];
+      let x = randomPoint.x;
+      let y = randomPoint.y;
+      maze[x][y] = 1;
+      toCheck.splice(index, 1);
+  
+      draw(x, y);
+  
+      connectCells(x, y, toCheck);
+    }, INTERVAL_TIME);
+  }
+
+  function connectCells(x, y, toCheck) {
     let direction = ["north", "south", "east", "west"];
     while (direction.length > 0) {
       let dirIndex = Math.floor(Math.random() * direction.length);
       switch (direction[dirIndex]) {
         case "north":
-          if (y - 2 >= 0 && maze[x][y - 2].isClear) {
-            maze[x][y - 1].clearCell();
+          if (y - 2 >= 0 && maze[x][y - 2] == 1) {
+            maze[x][y - 1] = 1;
+            draw(x, y - 1);
             direction.splice(0, direction.length);
           }
         break;
         case "south":
-          if (y + 2 < MAZE_HEIGHT && maze[x][y + 2].isClear) {
-            maze[x][y + 1].clearCell();
+          if (y + 2 < MAZE_HEIGHT && maze[x][y + 2] == 1) {
+            maze[x][y + 1] = 1;
+            draw(x, y + 1);
             direction.splice(0, direction.length);
           }
         break;
         case "east":
-          if (x - 2 >= 0 && maze[x - 2][y].isClear) {
-            maze[x - 1][y].clearCell();
+          if (x - 2 >= 0 && maze[x - 2][y] == 1) {
+            maze[x - 1][y] = 1;
+            draw(x - 1, y);
             direction.splice(0, direction.length);
           }
         break;
         case "west":
-          if (x + 2 < MAZE_WIDTH && maze[x + 2][y].isClear) {
-            maze[x + 1][y].clearCell();
+          if (x + 2 < MAZE_WIDTH && maze[x + 2][y] == 1) {
+            maze[x + 1][y] = 1;
+            draw(x + 1, y);
             direction.splice(0, direction.length);
           }
         break;
@@ -115,81 +155,100 @@ function createMaze(MAZE_WIDTH, MAZE_HEIGHT) {
       direction.splice(dirIndex, 1);
     }
 
-    if (y - 2 >= 0 && !(maze[x][y - 2].isClear)) {
-      toCheck.push(new Cell(x, y - 2));
+    if (y - 2 >= 0 && maze[x][y - 2] == 0) {
+      toCheck.push(new Point(x, y - 2));
+      maze[x][y - 2] = 2;
     }
-    if (y + 2 < MAZE_HEIGHT && !(maze[x][y + 2].isClear)) {
-      toCheck.push(new Cell(x, y + 2));
+    if (y + 2 < MAZE_HEIGHT && maze[x][y + 2] == 0) {
+      toCheck.push(new Point(x, y + 2));
+      maze[x][y + 2] = 2;
     }
-    if (x - 2 >= 0 && !(maze[x - 2][y].isClear)) {
-      toCheck.push(new Cell(x - 2, y));
+    if (x - 2 >= 0 && maze[x - 2][y] == 0) {
+      toCheck.push(new Point(x - 2, y));
+      maze[x - 2][y] = 2;
     }
-    if (x + 2 < MAZE_WIDTH && !(maze[x + 2][y].isClear)) {
-      toCheck.push(new Cell(x + 2, y));
+    if (x + 2 < MAZE_WIDTH && maze[x + 2][y] == 0) {
+      toCheck.push(new Point(x + 2, y));
+      maze[x + 2][y] = 2;
     }
+    toCheck.forEach(point => draw(point.x, point.y));
   }
-
-  deleteDeadEnds(MAZE_WIDTH, MAZE_HEIGHT);
-}
-
-function deleteDeadEnds(MAZE_WIDTH, MAZE_HEIGHT) {
-  for (let i = 0; i < 4; i++) {
-    let deadEnds = new Array();
-    for (let y = 0; y < MAZE_HEIGHT; y++) {
-      for (let x = 0; x < MAZE_WIDTH; x++) {
-        if (maze[x][y].isClear) {
-          let neighbors = 0;
-          if (y - 1 >= 0 && maze[x][y - 1].isClear) {
-            neighbors++;
-          }
-          if (y + 1 < MAZE_HEIGHT && maze[x][y + 1].isClear) {
-            neighbors++;
-          }
-          if (x - 1 >= 0 && maze[x - 1][y].isClear) {
-            neighbors++;
-          }
-          if (x + 1 < MAZE_WIDTH && maze[x + 1][y].isClear) {
-            neighbors++;
-          }
-          if (neighbors <= 1) {
-            deadEnds.push(new Cell(x, y))
+//
+//------------------------------------------
+//add-ons for the map
+  function deleteDeadEnds() {
+    for (let i = 0; i < 4; i++) {
+      let deadEnds = [];
+      for (let y = 0; y < MAZE_HEIGHT; y++) {
+        for (let x = 0; x < MAZE_WIDTH; x++) {
+          if (maze[x][y] == 1) {
+            let neighbors = 0;
+            if (y - 1 >= 0 && maze[x][y - 1] == 1) {
+              neighbors++;
+            }
+            if (y + 1 < MAZE_HEIGHT && maze[x][y + 1] == 1) {
+              neighbors++;
+            }
+            if (x - 1 >= 0 && maze[x - 1][y] == 1) {
+              neighbors++;
+            }
+            if (x + 1 < MAZE_WIDTH && maze[x + 1][y] == 1) {
+              neighbors++;
+            }
+            if (neighbors <= 1) {
+              deadEnds.push(new Point(x, y))
+            }
           }
         }
       }
+      
+      deadEnds.forEach(point => {
+        maze[point.x][point.y] = 0;
+        draw(point.x, point.y);
+      });
     }
-
-    deadEnds.forEach(cell => maze[cell.x][cell.y].makeWall());
   }
-}
 
-function drawMaze(MAZE_WIDTH, MAZE_HEIGHT) {
+  function cultivation(value) {
+    for (let i = 0; i < value; i++) {
+      let newCells = [];
+      for (let y = 0; y < MAZE_HEIGHT; y++) {
+        for (let x = 0; x < MAZE_WIDTH; x++) {
+          if (maze[x][y] == 0) {
+            let neighbors = 0;
+            for (let a = 0; a < 3; a++) {
+              for (let b = 0; b < 3; b++) {
+                let neighborX = x - a;
+                let neighborY = y - b;
+                if (neighborX >= 0 && neighborX < MAZE_WIDTH && neighborY >= 0 && neighborY < MAZE_HEIGHT) {
+                  if (maze[neighborX][neighborY] == 1) {
+                    neighbors++;
+                  }
+                }
+              }
+            }
+            if (neighbors >= 4) {
+              newCells.push(new Point(x, y));
+            }
+          }
+        }
+      }
+
+      newCells.forEach(point => {
+        maze[point.x][point.y] = 1;
+        draw(point.x, point.y);
+      });
+    }
+  }
+//
+//------------------------------------------
+//html functions
+function getMaze() {
+  createMaze();
+
   const CANVAS = document.getElementById("astar-canvas");
   const CTX = CANVAS.getContext("2d");
-  CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
-  
-  for (let y = 0; y < MAZE_HEIGHT; y++) {
-    for (let x = 0; x < MAZE_WIDTH; x++) {
-      const cell = maze[x][y];
-      if (!cell.isClear) {
-        CTX.drawImage(cell.wallImage, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-      } else {
-        CTX.drawImage(cell.floorImage, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-      }
-    }
+  for(let x = 0; x < MAZE_WIDTH; x++) {
+    CTX.drawImage(WALL_3D, x * CELL_SIZE, (MAZE_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
-}
-
-const ANIMATION_DELAY = 200;
-const MAX_ITERATIONS = 20;
-
-function createMazeAnimation(WIDTH, HEIGHT) {
-  let i = 0;
-  const animationInterval = setInterval(() => {
-    createMaze(WIDTH, HEIGHT);
-    drawMaze(WIDTH, HEIGHT);
-    i++;
-    if (i === MAX_ITERATIONS) {
-      clearInterval(animationInterval);
-    }
-  }, ANIMATION_DELAY);
 }
