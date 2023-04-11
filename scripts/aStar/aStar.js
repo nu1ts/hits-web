@@ -243,6 +243,96 @@ function draw(x, y) {
 //
 //------------------------------------------
 //html functions
+function aStar(startPoint, endPoint) {
+  let openSet = [];
+  let closedSet = [];
+  let cameFrom = new Map();
+
+  let gScore = new Map();
+  gScore.set(startPoint, 0);
+
+  let fScore = new Map();
+  fScore.set(startPoint, heuristic(startPoint, endPoint));
+
+  openSet.push(startPoint);
+
+  while (openSet.length > 0) {
+    let current = null;
+    let minFScore = Infinity;
+
+    for (let i = 0; i < openSet.length; i++) {
+      let point = openSet[i];
+      if (fScore.get(point) < minFScore) {
+        minFScore = fScore.get(point);
+        current = point;
+      }
+    }
+
+    if (current === endPoint) {
+      let path = [current];
+      while (cameFrom.has(current)) {
+        current = cameFrom.get(current);
+        path.unshift(current);
+      }
+      return path;
+    }
+
+    openSet = openSet.filter((point) => point !== current);
+    closedSet.push(current);
+
+    let neighbors = getNeighbors(current);
+
+    for (let i = 0; i < neighbors.length; i++) {
+      let neighbor = neighbors[i];
+
+      if (closedSet.indexOf(neighbor) !== -1) {
+        continue;
+      }
+
+      let tentativeGScore = gScore.get(current) + 1;
+
+      if (openSet.indexOf(neighbor) === -1) {
+        openSet.push(neighbor);
+      } else if (tentativeGScore >= gScore.get(neighbor)) {
+        continue;
+      }
+
+      cameFrom.set(neighbor, current);
+      gScore.set(neighbor, tentativeGScore);
+      fScore.set(
+        neighbor,
+        gScore.get(neighbor) + heuristic(neighbor, endPoint)
+      );
+    }
+  }
+
+  return null;
+}
+
+function heuristic(start, goal) {
+  return Math.abs(start.x - goal.x) + Math.abs(start.y - goal.y);
+}  
+
+function getNeighbors(point) {
+  let result = [];
+
+  if (point.x > 0) {
+    result.push({ x: point.x - 1, y: point.y });
+  }
+  if (point.y > 0) {
+    result.push({ x: point.x, y: point.y - 1 });
+  }
+  if (point.x < MAZE_WIDTH - 1) {
+    result.push({ x: point.x + 1, y: point.y });
+  }
+  if (point.y < MAZE_HEIGHT - 1) {
+    result.push({ x: point.x, y: point.y + 1 });
+  }
+
+  return result.filter((point) => maze[point.x][point.y] !== 0);
+}
+//------------------------------------------
+//html functions
 function getMaze() {
   createMaze();
 
