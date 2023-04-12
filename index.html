@@ -14,7 +14,6 @@
         <link rel="stylesheet" href="/scripts/clusteringAlgorithm/clusteringAlgorithm.css" type="text/css">
 
         <!-- scripts -->
-        <script src="scripts\aStar\aStar.js"></script>
         <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
         <script src="/scripts/decisionTree/decisionTree.js"></script>
         <script src="/scripts/geneticAlgorithm/geneticAlgorithm.js"></script>
@@ -33,9 +32,10 @@
 
         <div id="astar" class="tab-content", style="background-color: rgb(182, 219, 234);">
             <div id="astar-div">
-                
+                <canvas id="astar-canvas"></canvas>
             </div>
-            <button class="button-run" onclick="getMaze();"><font color="white">Генерация</font></button>
+            <script src="scripts/aStar/aStar.js" defer></script>
+            <button class="button-run" onclick="run();"><font color="white">Генерация</font></button>
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">

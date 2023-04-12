@@ -1,17 +1,12 @@
-//canvas creation
-window.addEventListener('load', function() {
-  const divContainer = document.getElementById('astar-div');
-  const newCanvas = document.createElement('canvas');
-  newCanvas.setAttribute('id', 'astar-canvas');
-  divContainer.appendChild(newCanvas);
-});
-//
-//------------------------------------------
 //constants
+const CANVAS = document.getElementById("astar-canvas");
+const CTX = CANVAS.getContext("2d");
 const CELL_SIZE  = 16;
-const MAZE_WIDTH = 69;
-const  MAZE_HEIGHT = 69;
-const INTERVAL_TIME = 10;
+const MAZE_WIDTH = 5;
+const MAZE_HEIGHT = 5;
+const INTERVAL_TIME = 5;
+let START_POINT = null;
+let END_POINT = null;
 let maze = [];
 //
 //------------------------------------------
@@ -24,6 +19,12 @@ const SELECT_IMAGE = new Image();
 SELECT_IMAGE.src = 'images/Select.png';
 const WALL_3D = new Image();
 WALL_3D.src = 'images/3DWall.png';
+const START_IMAGE = new Image();
+START_IMAGE.src = 'images/Start.png';
+const START_3D = new Image();
+START_3D.src = 'images/3DStart.png';
+const MOUSEOVER_FLOOR = new Image();
+MOUSEOVER_FLOOR.src = 'images/MouseoverFloorImage.png';
 //
 //------------------------------------------
 //-------------------CODE-------------------
@@ -38,16 +39,15 @@ class Point {
 //------------------------------------------
 //draw
 function draw(x, y) {
-  const CANVAS = document.getElementById("astar-canvas");
-  const CTX = CANVAS.getContext("2d");
-
   CTX.save();
   
   if(maze[x][y] != 2) {
     if (maze[x][y] == 1) {
-      CTX.drawImage(FLOOR_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      CTX.drawImage(FLOOR_IMAGE, x * CELL_SIZE, 
+        y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       if(maze[x][y - 1] == 0) {
-        CTX.drawImage(WALL_3D, x * CELL_SIZE, (y - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        CTX.drawImage(WALL_3D, x * CELL_SIZE, 
+          (y - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
     } else {
       CTX.drawImage(WALL_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
@@ -56,6 +56,15 @@ function draw(x, y) {
   else {
     CTX.drawImage(SELECT_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
+
+  if (maze[x][y] == 3) {
+    if(maze[x][y + 1] == 1) {
+      CTX.drawImage(PATH_3D, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+    else {
+      CTX.drawImage(PATH_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+  }
   
   CTX.restore();
 }
@@ -63,7 +72,6 @@ function draw(x, y) {
 //------------------------------------------
 //map
   function createMaze() {
-    const CANVAS = document.getElementById("astar-canvas");
     CANVAS.width = CELL_SIZE * MAZE_WIDTH;
     CANVAS.height = CELL_SIZE * MAZE_HEIGHT;
     
@@ -77,7 +85,9 @@ function draw(x, y) {
 
     let x = Math.floor(Math.random() * MAZE_WIDTH / 2) * 2 + 1;
     let y = Math.floor(Math.random() * MAZE_HEIGHT / 2) * 2 + 1;
-    maze[x][y] = 1;
+    if (x >= 0 && x < MAZE_WIDTH && y >= 0 && y < MAZE_HEIGHT) {
+      maze[x][y] = 1;
+    }
     draw(x, y);
 
     let toCheck = [];
@@ -220,7 +230,8 @@ function draw(x, y) {
               for (let b = 0; b < 3; b++) {
                 let neighborX = x - a;
                 let neighborY = y - b;
-                if (neighborX >= 0 && neighborX < MAZE_WIDTH && neighborY >= 0 && neighborY < MAZE_HEIGHT) {
+                if (neighborX >= 0 && neighborX < MAZE_WIDTH &&
+                   neighborY >= 0 && neighborY < MAZE_HEIGHT) {
                   if (maze[neighborX][neighborY] == 1) {
                     neighbors++;
                   }
@@ -242,66 +253,63 @@ function draw(x, y) {
   }
 //
 //------------------------------------------
-//html functions
-function aStar(startPoint, endPoint) {
-  let openSet = [];
-  let closedSet = [];
+//A* algorithm
+function aStar() {
+  let openPoints = [];
+  let closedPoints  = [];
+
   let cameFrom = new Map();
+  let gCost = new Map();
+  let fCost = new Map();
 
-  let gScore = new Map();
-  gScore.set(startPoint, 0);
+  openPoints.push(START_POINT);
+  gCost.set(START_POINT, 0);
+  fCost.set(START_POINT, heuristic(START_POINT, END_POINT));
 
-  let fScore = new Map();
-  fScore.set(startPoint, heuristic(startPoint, endPoint));
+  while (openPoints.length > 0) {
+    let currentPoint = null;
 
-  openSet.push(startPoint);
-
-  while (openSet.length > 0) {
-    let current = null;
-    let minFScore = Infinity;
-
-    for (let i = 0; i < openSet.length; i++) {
-      let point = openSet[i];
-      if (fScore.get(point) < minFScore) {
-        minFScore = fScore.get(point);
-        current = point;
+    openPoints.forEach(point => { 
+      if(!currentPoint || fCost.get(point) < fCost.get(currentPoint)) {
+        currentPoint = point;
       }
-    }
+    });
 
-    if (current === endPoint) {
-      let path = [current];
-      while (cameFrom.has(current)) {
-        current = cameFrom.get(current);
-        path.unshift(current);
+    if (currentPoint === END_POINT) {
+      let path = [currentPoint];
+      while (cameFrom.has(currentPoint)) {
+        currentPoint = cameFrom.get(currentPoint);
+        path.unshift(currentPoint);
       }
       return path;
     }
 
-    openSet = openSet.filter((point) => point !== current);
-    closedSet.push(current);
+    openPoints.splice(openPoints.indexOf(currentPoint), 1);
 
-    let neighbors = getNeighbors(current);
+    closedPoints.push(currentPoint);
+
+    let neighbors = getNeighbors(currentPoint);
 
     for (let i = 0; i < neighbors.length; i++) {
       let neighbor = neighbors[i];
 
-      if (closedSet.indexOf(neighbor) !== -1) {
+      if (closedPoints.indexOf(neighbor) !== -1) {
         continue;
       }
 
-      let tentativeGScore = gScore.get(current) + 1;
+      let tentativeGCost = gCost.get(currentPoint) + 1;
 
-      if (openSet.indexOf(neighbor) === -1) {
-        openSet.push(neighbor);
-      } else if (tentativeGScore >= gScore.get(neighbor)) {
+      if (!openPoints.includes(neighbor)) {
+        openPoints.push(neighbor);
+      } else if (tentativeGCost >= gCost.get(neighbor)) {
         continue;
-      }
+      }      
 
-      cameFrom.set(neighbor, current);
-      gScore.set(neighbor, tentativeGScore);
-      fScore.set(
+      cameFrom.set(neighbor, currentPoint);
+      gCost.set(neighbor, tentativeGCost);
+      fCost.set(
         neighbor,
-        gScore.get(neighbor) + heuristic(neighbor, endPoint)
+        gCost.get(neighbor) + heuristic(neighbor, END_POINT)
       );
     }
   }
@@ -329,16 +337,86 @@ function getNeighbors(point) {
     result.push({ x: point.x, y: point.y + 1 });
   }
 
-  return result.filter((point) => maze[point.x][point.y] !== 0);
+  let filteredResult = [];
+  for (let i = 0; i < result.length; i++) {
+    const point = result[i];
+    if (maze[point.x][point.y] !== 0) {
+      filteredResult.push(point);
+    }
+  }
+  return filteredResult;
 }
 //------------------------------------------
-//html functions
+//cell select animation
+let lastPoint;
+CANVAS.addEventListener('mousemove', (event) => {
+  if(START_POINT == undefined) {
+    const rect = CANVAS.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    const mazeX = Math.floor(mouseX / CELL_SIZE);
+    const mazeY = Math.floor(mouseY / CELL_SIZE);
+    
+    if (maze[mazeX] && maze[mazeX][mazeY]) {
+      if(maze[mazeX][mazeY] == 1) {
+        if(lastPoint != undefined) {
+          if(mazeX != lastPoint.x || mazeY != lastPoint.y) {
+            CTX.drawImage(FLOOR_IMAGE, lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            CTX.drawImage(MOUSEOVER_FLOOR, mazeX * CELL_SIZE, mazeY * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          }
+        }
+        lastPoint = new Point(mazeX, mazeY);
+      }
+    }
+  }
+});
+CANVAS.addEventListener('mouseleave', () => {
+  if(START_POINT == undefined) {
+    CTX.clearRect(lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    lastPoint = undefined;
+  }
+});
+
+function createLinePath(startX, startY, endX, endY) {
+  CTX.beginPath();
+  CTX.moveTo(startX, startY);
+  CTX.lineTo(endX, endY);
+  CTX.lineWidth = 10;
+  CTX.lineCap = 'round';
+  CTX.stroke();
+}
+
+CANVAS.addEventListener('click', (event) => {
+  const rect = CANVAS.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const mazeX = Math.floor(mouseX / CELL_SIZE);
+  const mazeY = Math.floor(mouseY / CELL_SIZE);
+  
+  if (maze[mazeX] && maze[mazeX][mazeY] && maze[mazeX][mazeY] == 1) {
+    if(START_POINT == undefined) {
+      START_POINT = new Point(mazeX, mazeY);
+      CTX.drawImage(START_3D, START_POINT.x * CELL_SIZE, START_POINT.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+    else if (END_POINT == undefined) {
+      END_POINT = new Point(mazeX, mazeY);
+      let path = aStar();
+      for (let i = 0; i < path.length - 1; i += 2) {
+        createLinePath(path[i], path[i+1]);
+      }
+    }
+  }
+});
+//
+//------------------------------------------
+//run code
 function getMaze() {
   createMaze();
-
-  const CANVAS = document.getElementById("astar-canvas");
-  const CTX = CANVAS.getContext("2d");
   for(let x = 0; x < MAZE_WIDTH; x++) {
     CTX.drawImage(WALL_3D, x * CELL_SIZE, (MAZE_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
 }
+function run() {
+  getMaze();
+}
+//
