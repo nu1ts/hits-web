@@ -12,54 +12,54 @@
 
         <link rel="stylesheet" href="/scripts/aStar/aStarStyle.css" type="text/css">
         <link rel="stylesheet" href="/scripts/clusteringAlgorithm/clusteringAlgorithm.css" type="text/css">
+        <link rel="stylesheet" href="/scripts/antAlgorithm/antAlgorithm.css" type="text/css">
 
-        <!-- scripts -->
-        <script src="scripts\aStar\aStar.js"></script>
-        <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
-        <script src="/scripts/decisionTree/decisionTree.js"></script>
-        <script src="/scripts/geneticAlgorithm/geneticAlgorithm.js"></script>
-        <script src="/scripts/neuralNetwork/neuralNetwork.js"></script>
     </head>
 
     <body>
-        <div class="tab">
+        <div class="tab", id = "tab">
             <button class="tablinks" onclick="openTab(event, 'astar')"><font color="white">А*</font></button>
             <button class="tablinks" onclick="openTab(event, 'clusteringAlg')"><font color="white">Алгоритм кластеризации</font></button>
             <button class="tablinks" onclick="openTab(event, '2')"><font color="white">Генетический алгоритм</font></button>
-            <button class="tablinks" onclick="openTab(event, '3')"><font color="white">Муравьиный алгоритм</font></button>
+            <button class="tablinks" onclick="openTab(event, 'antAlg')"><font color="white">Муравьиный алгоритм</font></button>
             <button class="tablinks" onclick="openTab(event, '4')"><font color="white">Дерево решений</font></button>
             <button class="tablinks" onclick="openTab(event, '5')"><font color="white">Нейронная сеть</font></button>
         </div>
 
+        <script src="/scripts/mainScript.js"></script>
+
         <div id="astar" class="tab-content", style="background-color: rgb(182, 219, 234);">
             <div id="astar-div">
-                
+                <canvas id = "canvas0", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
             </div>
             <button class="button-run" onclick="createMaze(50, 50)"><font color="white">Запустить</font></button>
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
-            <button class="button-run" onclick="runClusteringAlg()"><font color="white">Запустить</font></button>
-            <canvas id = "canvas1", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);"></canvas>
+            <canvas id = "canvas1", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
             <script src="/scripts/clusteringAlgorithm/clusteringAlgorithm.js"></script>
-            <input class = 'K' id = 'K' type="text", style="color: white"></input>
-            <p, style="position: absolute; bottom: 0.3vw; right: 13vw; font-size: 1rem; font-family: 'Cuprum', sans-serif;">Введите значение K:</p>
+            <input class = 'K' id = 'K' onClick="this.select();" type="text", style="color: white", placeholder="K"></input>
+            <button class="button-run" onclick="runClusteringAlg()"><font color="white">Запустить</font></button>
         </div>
 
         <div id="2" class="tab-content">
-
+            <canvas id = "canvas2", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
         </div>
 
-        <div id="3" class="tab-content">
-
+        <div id="antAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
+            <canvas id = "canvas3", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
+            <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
+            <span style="position: relative; margin-top: 2vw; margin-left: 60vw;font-size: 1rem; font-family: 'Cuprum', sans-serif;">Длина маршрута</span>
+            <input class="Way", id = "Way" type="text" style="color: white" readonly><font color="white"></font>
+            <button class="button-run" onclick="runAntAlg()"><font color="white">Запустить</font></button>
         </div>
 
         <div id="4" class="tab-content">
-
+            <canvas id = "canvas4", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
         </div>
 
         <div id="5" class="tab-content">
-
+            <canvas id = "canvas5", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
         </div>
         
         <script>
