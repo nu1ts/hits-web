@@ -2,8 +2,8 @@
 const CANVAS = document.getElementById("astar-canvas");
 const CTX = CANVAS.getContext("2d");
 const CELL_SIZE  = 16;
-const MAZE_WIDTH = 5;
-const MAZE_HEIGHT = 5;
+const MAZE_WIDTH = 101;
+const MAZE_HEIGHT = 101;
 const INTERVAL_TIME = 5;
 let START_POINT = null;
 let END_POINT = null;
@@ -254,97 +254,28 @@ function draw(x, y) {
 //
 //------------------------------------------
 //A* algorithm
+function heuristic(start, goal) {
+  return Math.abs(start.x - goal.x) + Math.abs(start.y - goal.y);
+}
+
 function aStar() {
   let openPoints = [];
   let closedPoints  = [];
 
-  let cameFrom = new Map();
+  openPoints.push(START_POINT);
+
   let gCost = new Map();
+  gCost.set(START_POINT, 0);
+
+  let currentPoint;
+  while(openPoints.length > 0) {
+    Math.min.apply(null, [1,3,5,-1,8,0])
+  }
+
+  let cameFrom = new Map();
   let fCost = new Map();
 
-  openPoints.push(START_POINT);
-  gCost.set(START_POINT, 0);
   fCost.set(START_POINT, heuristic(START_POINT, END_POINT));
-
-  while (openPoints.length > 0) {
-    let currentPoint = null;
-
-    openPoints.forEach(point => { 
-      if(!currentPoint || fCost.get(point) < fCost.get(currentPoint)) {
-        currentPoint = point;
-      }
-    });
-
-    if (currentPoint === END_POINT) {
-      let path = [currentPoint];
-      while (cameFrom.has(currentPoint)) {
-        currentPoint = cameFrom.get(currentPoint);
-        path.unshift(currentPoint);
-      }
-      return path;
-    }
-
-    openPoints.splice(openPoints.indexOf(currentPoint), 1);
-
-    closedPoints.push(currentPoint);
-
-    let neighbors = getNeighbors(currentPoint);
-
-    for (let i = 0; i < neighbors.length; i++) {
-      let neighbor = neighbors[i];
-
-      if (closedPoints.indexOf(neighbor) !== -1) {
-        continue;
-      }
-
-      let tentativeGCost = gCost.get(currentPoint) + 1;
-
-      if (!openPoints.includes(neighbor)) {
-        openPoints.push(neighbor);
-      } else if (tentativeGCost >= gCost.get(neighbor)) {
-        continue;
-      }      
-
-      cameFrom.set(neighbor, currentPoint);
-      gCost.set(neighbor, tentativeGCost);
-      fCost.set(
-        neighbor,
-        gCost.get(neighbor) + heuristic(neighbor, END_POINT)
-      );
-    }
-  }
-
-  return null;
-}
-
-function heuristic(start, goal) {
-  return Math.abs(start.x - goal.x) + Math.abs(start.y - goal.y);
-}  
-
-function getNeighbors(point) {
-  let result = [];
-
-  if (point.x > 0) {
-    result.push({ x: point.x - 1, y: point.y });
-  }
-  if (point.y > 0) {
-    result.push({ x: point.x, y: point.y - 1 });
-  }
-  if (point.x < MAZE_WIDTH - 1) {
-    result.push({ x: point.x + 1, y: point.y });
-  }
-  if (point.y < MAZE_HEIGHT - 1) {
-    result.push({ x: point.x, y: point.y + 1 });
-  }
-
-  let filteredResult = [];
-  for (let i = 0; i < result.length; i++) {
-    const point = result[i];
-    if (maze[point.x][point.y] !== 0) {
-      filteredResult.push(point);
-    }
-  }
-  return filteredResult;
 }
 //------------------------------------------
 //cell select animation
