@@ -2,8 +2,8 @@
 const CANVAS = document.getElementById("astar-canvas");
 const CTX = CANVAS.getContext("2d");
 const CELL_SIZE  = 16;
-const MAZE_WIDTH = 51;
-const MAZE_HEIGHT = 51;
+const MAZE_WIDTH = 139;
+const MAZE_HEIGHT = 61;
 const INTERVAL_TIME = 5;
 let START_POINT = null;
 let END_POINT = null;
@@ -258,36 +258,84 @@ function heuristic(start, goal) {
   return Math.abs(start.x - goal.x) + Math.abs(start.y - goal.y);
 }
 
+function getNeighbors(point) {
+  const neighbors = [];
+  if (maze[point.x - 1]?.[point.y] === 1) neighbors.push(new Point(point.x - 1, point.y));
+  if (maze[point.x + 1]?.[point.y] === 1) neighbors.push(new Point(point.x + 1, point.y));
+  if (maze[point.x]?.[point.y - 1] === 1) neighbors.push(new Point(point.x, point.y - 1));
+  if (maze[point.x]?.[point.y + 1] === 1) neighbors.push(new Point(point.x, point.y + 1));
+  return neighbors;
+}
+
 function aStar() {
-  let openPoints = [];
-  let closedPoints  = [];
+  const openPoints = [new Point(START_POINT.x, START_POINT.y)];
+  const closedPoints = [];
 
-  openPoints.push(START_POINT);
+  const gCost = [[new Point(START_POINT.x, START_POINT.y), 0]];
+  const fCost = [[new Point(START_POINT.x, START_POINT.y), heuristic(START_POINT, END_POINT)]];
 
-  let gCost = new Map();
-  gCost.set(START_POINT, 0);
+  const cameFrom = [];
 
   let currentPoint;
-  while(openPoints.length > 0) {
-    Math.min.apply(null, [1,3,5,-1,8,0])
+  while (openPoints.length > 0) {
+    let minFCost = Infinity;
+    for (let i = 0; i < openPoints.length; i++) {
+      const pointFCost = fCost.find((point) => point[0].x === openPoints[i].x && point[0].y === openPoints[i].y)[1];
+      if (pointFCost < minFCost) {
+        currentPoint = openPoints[i];
+        minFCost = pointFCost;
+      }
+    }
+
+    if (currentPoint.x === END_POINT.x && currentPoint.y === END_POINT.y) {
+      const path = [END_POINT];
+      while (path[0].x !== START_POINT.x || path[0].y !== START_POINT.y) {
+        path.unshift(cameFrom.find((point) => point[0].x === path[0].x && point[0].y === path[0].y)[1]);
+      }
+      return path;
+    }
+
+    openPoints.splice(openPoints.indexOf(currentPoint), 1);
+    closedPoints.push(currentPoint);
+
+    for (let neighbor of getNeighbors(currentPoint)) {
+      if (closedPoints.find((point) => point.x === neighbor.x && point.y === neighbor.y)) {
+        continue;
+      }
+
+      const neighborGCostIndex = gCost.findIndex((point) => point[0].x === neighbor.x && point[0].y === neighbor.y);
+      const tentativeGCost = gCost.find((point) => point[0].x === currentPoint.x && point[0].y === currentPoint.y)[1] + 1;
+
+      if (neighborGCostIndex === -1) {
+        openPoints.push(neighbor);
+        gCost.push([neighbor, tentativeGCost]);
+      } else if (tentativeGCost >= gCost[neighborGCostIndex][1]) {
+        continue;
+      }
+
+      cameFrom.push([neighbor, currentPoint]);
+      if (neighborGCostIndex === -1) {
+        fCost.push([neighbor, tentativeGCost + heuristic(neighbor, END_POINT)]);
+      } else {
+        fCost[neighborGCostIndex][1] = tentativeGCost + heuristic(neighbor, END_POINT);
+      }
+    }
   }
 
-  let cameFrom = new Map();
-  let fCost = new Map();
-
-  fCost.set(START_POINT, heuristic(START_POINT, END_POINT));
+  return null;
 }
+
 //------------------------------------------
 //cell select animation
-let lastPoint;
+let lastPoint = null;
 CANVAS.addEventListener('mousemove', (event) => {
-  if(START_POINT == undefined) {
-    const rect = CANVAS.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-    const mazeX = Math.floor(mouseX / CELL_SIZE);
-    const mazeY = Math.floor(mouseY / CELL_SIZE);
+  const rect = CANVAS.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const mazeX = Math.floor(mouseX / CELL_SIZE);
+  const mazeY = Math.floor(mouseY / CELL_SIZE);
     
+  if(START_POINT == undefined) {
     if (maze[mazeX] && maze[mazeX][mazeY]) {
       if(maze[mazeX][mazeY] == 1) {
         if(lastPoint != undefined) {
@@ -300,7 +348,21 @@ CANVAS.addEventListener('mousemove', (event) => {
       }
     }
   }
+  else if(END_POINT == undefined) {
+    if (maze[mazeX] && maze[mazeX][mazeY]) {
+      if(maze[mazeX][mazeY] == 1) {
+        if(lastPoint != undefined) {
+          if((mazeX != lastPoint.x || mazeY != lastPoint.y) && (START_POINT.x != lastPoint.x || START_POINT.y != lastPoint.y)) {
+            CTX.drawImage(FLOOR_IMAGE, lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            CTX.drawImage(MOUSEOVER_FLOOR, mazeX * CELL_SIZE, mazeY * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          }
+        }
+        lastPoint = new Point(mazeX, mazeY);
+      }
+    }
+  }
 });
+
 CANVAS.addEventListener('mouseleave', () => {
   if(START_POINT == undefined) {
     CTX.clearRect(lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
@@ -309,13 +371,21 @@ CANVAS.addEventListener('mouseleave', () => {
 });
 
 function createLinePath(startX, startY, endX, endY) {
+  const centerStartX = startX + 0.5;
+  const centerStartY = startY + 0.5;
+  const centerEndX = endX + 0.5;
+  const centerEndY = endY + 0.5;
+  
   CTX.beginPath();
-  CTX.moveTo(startX, startY);
-  CTX.lineTo(endX, endY);
-  CTX.lineWidth = 10;
+  CTX.moveTo(centerStartX * CELL_SIZE, centerStartY * CELL_SIZE);
+  CTX.lineTo(centerEndX * CELL_SIZE, centerEndY * CELL_SIZE);
+  CTX.lineWidth = CELL_SIZE / 3.5;
   CTX.lineCap = 'round';
+  CTX.strokeStyle = '#38905c'
   CTX.stroke();
 }
+
+let lastPath = [];
 
 CANVAS.addEventListener('click', (event) => {
   const rect = CANVAS.getBoundingClientRect();
@@ -323,31 +393,60 @@ CANVAS.addEventListener('click', (event) => {
   const mouseY = event.clientY - rect.top;
   const mazeX = Math.floor(mouseX / CELL_SIZE);
   const mazeY = Math.floor(mouseY / CELL_SIZE);
+
+  let newPath;
   
   if (maze[mazeX] && maze[mazeX][mazeY] && maze[mazeX][mazeY] == 1) {
     if(START_POINT == undefined) {
       START_POINT = new Point(mazeX, mazeY);
       CTX.drawImage(START_3D, START_POINT.x * CELL_SIZE, START_POINT.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     }
-    else if (END_POINT == undefined) {
+    else {
       END_POINT = new Point(mazeX, mazeY);
-      let path = aStar();
-      for (let i = 0; i < path.length - 1; i += 2) {
-        createLinePath(path[i], path[i+1]);
+      newPath = aStar();
+      let currentIndex = 0;
+      let interval = setInterval(() => {
+        if (currentIndex >= newPath.length - 1) {
+          clearInterval(interval);
+          return;
+        }
+
+        if (currentIndex == 0) {
+          createLinePath(newPath[currentIndex].x, newPath[currentIndex].y, newPath[currentIndex+1].x, newPath[currentIndex+1].y);
+          CTX.drawImage(START_3D, START_POINT.x * CELL_SIZE, START_POINT.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        else {
+          CTX.drawImage(FLOOR_IMAGE, END_POINT.x * CELL_SIZE, END_POINT.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          createLinePath(newPath[currentIndex].x, newPath[currentIndex].y, newPath[currentIndex+1].x, newPath[currentIndex+1].y);
+        }
+
+        currentIndex++;
+      }, INTERVAL_TIME);
+      if (END_POINT != undefined) {
+        if (lastPath.length > 0) {
+          CTX.drawImage(FLOOR_IMAGE, lastPath[lastPath.length - 1].x * CELL_SIZE, lastPath[lastPath.length - 1].y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        for (let i = 0; i < lastPath.length - 1; i++) {
+          CTX.drawImage(FLOOR_IMAGE, lastPath[i].x * CELL_SIZE, lastPath[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        lastPath = newPath;
+        CTX.drawImage(START_3D, START_POINT.x * CELL_SIZE, START_POINT.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
+      
     }
   }
 });
+
 //
 //------------------------------------------
 //run code
 function getMaze() {
+  START_POINT = null;
+  END_POINT = null;
+  lastPoint = null;
   createMaze();
   for(let x = 0; x < MAZE_WIDTH; x++) {
     CTX.drawImage(WALL_3D, x * CELL_SIZE, (MAZE_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
-}
-function run() {
-  getMaze();
 }
 //

@@ -23,7 +23,7 @@
 
     <body>
         <div class="tab", id = "tab">
-            <button class="tablinks" onclick="openAStar(event, 'astar')"><font color="white">А*</font></button>
+            <button class="tablinks" onclick="openTab(event, 'astar')"><font color="white">А*</font></button>
             <button class="tablinks" onclick="openTab(event, 'clusteringAlg')"><font color="white">Алгоритм кластеризации</font></button>
             <button class="tablinks" onclick="openTab(event, '2')"><font color="white">Генетический алгоритм</font></button>
             <button class="tablinks" onclick="openTab(event, 'antAlg')"><font color="white">Муравьиный алгоритм</font></button>
@@ -38,7 +38,7 @@
                 <canvas id="astar-canvas"></canvas>
             </div>
             <script src="scripts/aStar/aStar.js" defer></script>
-            <button class="button-run" onclick="run();"><font color="white">Генерация</font></button>
+            <button class="btn" onclick="getMaze();"><font color="white">Сгенерировать лабиринт</font></button>
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
@@ -82,24 +82,8 @@
                     tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }   
                 
-                document.getElementById(algorithmName).style.display = "inline-block";
-                evt.currentTarget.className += " active";
-            }
-
-            function openAStar(evt, algorithmName) {
-                var i, tabContent, tablinks;
-
-                tabContent = document.getElementsByClassName("tab-content");
-                for (i = 0; i < tabContent.length; i++) {
-                    tabContent[i].style.display = "none";
-                }
-
-                tablinks = document.getElementsByClassName("tablinks");
-                for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].className = tablinks[i].className.replace(" active", "");
-                }   
-                
-                document.getElementById(algorithmName).style.display = "block";
+                if (algorithmName != 'astar') document.getElementById(algorithmName).style.display = "inline-block";
+                else document.getElementById(algorithmName).style.display = "block";
                 evt.currentTarget.className += " active";
             }
         </script>
