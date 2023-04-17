@@ -1,5 +1,4 @@
-
-#clusteringAlg {
+#antAlg {
     background-color: #fff;
     border: 2px solid #000;
     border-top: none;
@@ -8,21 +7,20 @@
     position: relative;
 }
 
-#clusteringAlg button.button-run {
+#antAlg button.button-run {
     position: relative;
     background-color: #7db8ff;
     border: 2px solid #000;
+    margin-left: 2vw;
     cursor: pointer;
     font-size: 1rem;
     font-family: 'Cuprum', sans-serif;
 }
-#clusteringAlg .K{
+
+#antAlg .Way{
     position: relative;
-    margin-top: 0.5vw;
-    margin-left: 75vw;
-    margin-right: 2vw;
-    margin-bottom: 0.5vw;
     text-align: center;
+    margin-top: 1vw;
     background-color: #7db8ff;
     transition: padding 0.3s;
     transition: font-size 0.3s ease-in-out;
@@ -30,5 +28,5 @@
     cursor: pointer;
     font-size: 1rem;
     font-family: 'Cuprum', sans-serif;
-    width: 2vw;
+    width: 4vw;
 }
