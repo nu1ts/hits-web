@@ -2,8 +2,8 @@
 const CANVAS = document.getElementById("astar-canvas");
 const CTX = CANVAS.getContext("2d");
 const CELL_SIZE  = 16;
-const MAZE_WIDTH = 139;
-const MAZE_HEIGHT = 61;
+const MAZE_WIDTH = 41;
+const MAZE_HEIGHT = 41;
 const INTERVAL_TIME = 5;
 let START_POINT = null;
 let END_POINT = null;
@@ -25,6 +25,10 @@ const START_3D = new Image();
 START_3D.src = 'images/3DStart.png';
 const MOUSEOVER_FLOOR = new Image();
 MOUSEOVER_FLOOR.src = 'images/MouseoverFloorImage.png';
+const OPEN_POINT = new Image();
+OPEN_POINT.src = 'images/OpenPoint.png';
+const CLOSED_POINT = new Image();
+CLOSED_POINT.src = 'images/ClosedPoint.png';
 //
 //------------------------------------------
 //-------------------CODE-------------------
@@ -254,12 +258,58 @@ function draw(x, y) {
 //
 //------------------------------------------
 //A* algorithm
+function updateCells(inputArray, type) {
+  if(type == 'open') {
+    inputArray.forEach(point => {
+      if((point.x != START_POINT.x && point.y != START_POINT.y) && (point.x != END_POINT.x && point.y != END_POINT.y)) {
+        CTX.drawImage(OPEN_POINT, point.x * CELL_SIZE, point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      }
+    });
+  }
+  else {
+    inputArray.forEach(point => {
+      if((point.x != START_POINT.x && point.y != START_POINT.y) && (point.x != END_POINT.x && point.y != END_POINT.y)) {
+        CTX.drawImage(CLOSED_POINT, point.x * CELL_SIZE, point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      }
+    });
+  }
+}
+
+let searchInterval;
+
+function startSearch() {
+  // Остановите интервал, если он уже запущен
+  clearInterval(searchInterval);
+  
+  // Сбросьте интерфейс и подготовьте алгоритм для запуска
+  resetInterface();
+  prepareAlgorithm();
+  
+  // Запустите поиск маршрута
+  runSearch();
+  
+  // Начните обновлять интерфейс каждые 50 мс
+  searchInterval = setInterval(updateInterface, 50);
+}
+
+function updateInterface() {
+  // Обновите интерфейс в соответствии с текущим состоянием алгоритма
+  updateCells(openPoints, 'open');
+  updateCells(closedPoints, 'closed');
+  updateCells(path, 'path');
+  
+  // Проверьте, был ли найден маршрут, и если да, остановите интервал
+  if (path.length > 0) {
+    clearInterval(searchInterval);
+  }
+}
+
 function heuristic(start, goal) {
   return Math.abs(start.x - goal.x) + Math.abs(start.y - goal.y);
 }
 
 function getNeighbors(point) {
-  const neighbors = [];
+  let neighbors = [];
   if (maze[point.x - 1]?.[point.y] === 1) neighbors.push(new Point(point.x - 1, point.y));
   if (maze[point.x + 1]?.[point.y] === 1) neighbors.push(new Point(point.x + 1, point.y));
   if (maze[point.x]?.[point.y - 1] === 1) neighbors.push(new Point(point.x, point.y - 1));
@@ -268,19 +318,19 @@ function getNeighbors(point) {
 }
 
 function aStar() {
-  const openPoints = [new Point(START_POINT.x, START_POINT.y)];
-  const closedPoints = [];
+  let openPoints = [new Point(START_POINT.x, START_POINT.y)];
+  let closedPoints = [];
 
-  const gCost = [[new Point(START_POINT.x, START_POINT.y), 0]];
-  const fCost = [[new Point(START_POINT.x, START_POINT.y), heuristic(START_POINT, END_POINT)]];
+  let gCost = [[new Point(START_POINT.x, START_POINT.y), 0]];
+  let fCost = [[new Point(START_POINT.x, START_POINT.y), heuristic(START_POINT, END_POINT)]];
 
-  const cameFrom = [];
+  let cameFrom = [];
 
   let currentPoint;
   while (openPoints.length > 0) {
     let minFCost = Infinity;
     for (let i = 0; i < openPoints.length; i++) {
-      const pointFCost = fCost.find((point) => point[0].x === openPoints[i].x && point[0].y === openPoints[i].y)[1];
+      let pointFCost = fCost.find((point) => point[0].x === openPoints[i].x && point[0].y === openPoints[i].y)[1];
       if (pointFCost < minFCost) {
         currentPoint = openPoints[i];
         minFCost = pointFCost;
@@ -288,7 +338,7 @@ function aStar() {
     }
 
     if (currentPoint.x === END_POINT.x && currentPoint.y === END_POINT.y) {
-      const path = [END_POINT];
+      let path = [END_POINT];
       while (path[0].x !== START_POINT.x || path[0].y !== START_POINT.y) {
         path.unshift(cameFrom.find((point) => point[0].x === path[0].x && point[0].y === path[0].y)[1]);
       }
@@ -299,6 +349,7 @@ function aStar() {
     closedPoints.push(currentPoint);
 
     for (let neighbor of getNeighbors(currentPoint)) {
+
       if (closedPoints.find((point) => point.x === neighbor.x && point.y === neighbor.y)) {
         continue;
       }
@@ -364,10 +415,7 @@ CANVAS.addEventListener('mousemove', (event) => {
 });
 
 CANVAS.addEventListener('mouseleave', () => {
-  if(START_POINT == undefined) {
-    CTX.clearRect(lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-    lastPoint = undefined;
-  }
+  CTX.drawImage(FLOOR_IMAGE, lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 });
 
 function createLinePath(startX, startY, endX, endY) {
