@@ -38,7 +38,8 @@
                 <canvas id="astar-canvas"></canvas>
             </div>
             <script src="scripts/aStar/aStar.js" defer></script>
-            <button class="btn" onclick="getMaze();"><font color="white">Сгенерировать лабиринт</font></button>
+            <button id="run" class="btn" onclick="getMaze();">Сгенерировать лабиринт</button>
+            <button id="edit" class="btn" onclick="editMaze()">Изменить лабиринт</button>
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">

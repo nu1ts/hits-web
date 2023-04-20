@@ -29,6 +29,8 @@ const OPEN_POINT = new Image();
 OPEN_POINT.src = 'images/OpenPoint.png';
 const CLOSED_POINT = new Image();
 CLOSED_POINT.src = 'images/ClosedPoint.png';
+const MOUSEMOVE_EDIT = new Image();
+MOUSEMOVE_EDIT.src = 'images/MousemoveEditImage.png';
 //
 //------------------------------------------
 //-------------------CODE-------------------
@@ -47,14 +49,17 @@ function draw(x, y) {
   
   if(maze[x][y] != 2) {
     if (maze[x][y] == 1) {
-      CTX.drawImage(FLOOR_IMAGE, x * CELL_SIZE, 
-        y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      CTX.drawImage(FLOOR_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       if(maze[x][y - 1] == 0) {
-        CTX.drawImage(WALL_3D, x * CELL_SIZE, 
-          (y - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        CTX.drawImage(WALL_3D, x * CELL_SIZE, (y - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
     } else {
-      CTX.drawImage(WALL_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      if(maze[x][y + 1] == 1) {
+        CTX.drawImage(WALL_3D, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      }
+      else {
+        CTX.drawImage(WALL_IMAGE, x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      }
     }
   }
   else {
@@ -75,9 +80,9 @@ function draw(x, y) {
 //
 //------------------------------------------
 //map
-  function createMaze() {
+  function createMazeRect() {
     CANVAS.width = CELL_SIZE * MAZE_WIDTH;
-    CANVAS.height = CELL_SIZE * MAZE_HEIGHT;
+    CANVAS.height = CELL_SIZE * MAZE_HEIGHT
     
     for (let x = 0; x < MAZE_WIDTH; x++) {
       maze[x] = new Array(MAZE_HEIGHT);
@@ -87,11 +92,30 @@ function draw(x, y) {
       }
     }
 
+    for(let x = 0; x < MAZE_WIDTH; x++) {
+      CTX.drawImage(WALL_3D, x * CELL_SIZE, (MAZE_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+  }
+
+  function createMazeBorders() {
+    for(let x = 0; x < MAZE_WIDTH; x++) {
+      CTX.drawImage(WALL_3D, x * CELL_SIZE, (MAZE_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      CTX.drawImage(WALL_3D, x * CELL_SIZE, 0 * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+
+    CTX.drawImage(WALL_IMAGE, 0 * CELL_SIZE, 0 * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    CTX.drawImage(WALL_IMAGE, (MAZE_WIDTH - 1) * CELL_SIZE, 0 * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+  }
+
+  function createMaze() {
+    createMazeRect();
+
     let x = Math.floor(Math.random() * MAZE_WIDTH / 2) * 2 + 1;
     let y = Math.floor(Math.random() * MAZE_HEIGHT / 2) * 2 + 1;
     if (x >= 0 && x < MAZE_WIDTH && y >= 0 && y < MAZE_HEIGHT) {
       maze[x][y] = 1;
     }
+
     draw(x, y);
 
     let toCheck = [];
@@ -258,49 +282,12 @@ function draw(x, y) {
 //
 //------------------------------------------
 //A* algorithm
-function updateCells(inputArray, type) {
+function updateCell(inputCell, type) {
   if(type == 'open') {
-    inputArray.forEach(point => {
-      if((point.x != START_POINT.x && point.y != START_POINT.y) && (point.x != END_POINT.x && point.y != END_POINT.y)) {
-        CTX.drawImage(OPEN_POINT, point.x * CELL_SIZE, point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-      }
-    });
+    CTX.drawImage(OPEN_POINT, inputCell.x * CELL_SIZE, inputCell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
   else {
-    inputArray.forEach(point => {
-      if((point.x != START_POINT.x && point.y != START_POINT.y) && (point.x != END_POINT.x && point.y != END_POINT.y)) {
-        CTX.drawImage(CLOSED_POINT, point.x * CELL_SIZE, point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-      }
-    });
-  }
-}
-
-let searchInterval;
-
-function startSearch() {
-  // Остановите интервал, если он уже запущен
-  clearInterval(searchInterval);
-  
-  // Сбросьте интерфейс и подготовьте алгоритм для запуска
-  resetInterface();
-  prepareAlgorithm();
-  
-  // Запустите поиск маршрута
-  runSearch();
-  
-  // Начните обновлять интерфейс каждые 50 мс
-  searchInterval = setInterval(updateInterface, 50);
-}
-
-function updateInterface() {
-  // Обновите интерфейс в соответствии с текущим состоянием алгоритма
-  updateCells(openPoints, 'open');
-  updateCells(closedPoints, 'closed');
-  updateCells(path, 'path');
-  
-  // Проверьте, был ли найден маршрут, и если да, остановите интервал
-  if (path.length > 0) {
-    clearInterval(searchInterval);
+    CTX.drawImage(CLOSED_POINT, inputCell.x * CELL_SIZE, inputCell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
   }
 }
 
@@ -317,6 +304,14 @@ function getNeighbors(point) {
   return neighbors;
 }
 
+/*openPoints.forEach(point => {
+  updateCell(point, "open");
+})
+
+closedPoints.forEach(point => {
+  updateCell(point, "closed");
+})*/
+
 function aStar() {
   let openPoints = [new Point(START_POINT.x, START_POINT.y)];
   let closedPoints = [];
@@ -328,6 +323,7 @@ function aStar() {
 
   let currentPoint;
   while (openPoints.length > 0) {
+    
     let minFCost = Infinity;
     for (let i = 0; i < openPoints.length; i++) {
       let pointFCost = fCost.find((point) => point[0].x === openPoints[i].x && point[0].y === openPoints[i].y)[1];
@@ -378,8 +374,16 @@ function aStar() {
 
 //------------------------------------------
 //cell select animation
+const runBtn = document.getElementById('run');
 let lastPoint = null;
-CANVAS.addEventListener('mousemove', (event) => {
+runBtn.addEventListener('click', function() {
+  CANVAS.removeEventListener('mousemove', editMouseMoveHandler);
+  CANVAS.removeEventListener('click', editClickHandler);
+  CANVAS.addEventListener('mousemove', runMouseMoveHandler);
+  CANVAS.addEventListener('click', runClickHandler);
+});
+
+function runMouseMoveHandler(event) {
   const rect = CANVAS.getBoundingClientRect();
   const mouseX = event.clientX - rect.left;
   const mouseY = event.clientY - rect.top;
@@ -412,11 +416,7 @@ CANVAS.addEventListener('mousemove', (event) => {
       }
     }
   }
-});
-
-CANVAS.addEventListener('mouseleave', () => {
-  CTX.drawImage(FLOOR_IMAGE, lastPoint.x * CELL_SIZE, lastPoint.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-});
+}
 
 function createLinePath(startX, startY, endX, endY) {
   const centerStartX = startX + 0.5;
@@ -435,7 +435,7 @@ function createLinePath(startX, startY, endX, endY) {
 
 let lastPath = [];
 
-CANVAS.addEventListener('click', (event) => {
+function runClickHandler(event) {
   const rect = CANVAS.getBoundingClientRect();
   const mouseX = event.clientX - rect.left;
   const mouseY = event.clientY - rect.top;
@@ -470,9 +470,11 @@ CANVAS.addEventListener('click', (event) => {
 
         currentIndex++;
       }, INTERVAL_TIME);
+
       if (END_POINT != undefined) {
         if (lastPath.length > 0) {
-          CTX.drawImage(FLOOR_IMAGE, lastPath[lastPath.length - 1].x * CELL_SIZE, lastPath[lastPath.length - 1].y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          CTX.drawImage(FLOOR_IMAGE, lastPath[lastPath.length - 1].x * CELL_SIZE, lastPath[lastPath.length - 1].y
+            * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
         for (let i = 0; i < lastPath.length - 1; i++) {
           CTX.drawImage(FLOOR_IMAGE, lastPath[i].x * CELL_SIZE, lastPath[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
@@ -480,11 +482,106 @@ CANVAS.addEventListener('click', (event) => {
         lastPath = newPath;
         CTX.drawImage(START_3D, START_POINT.x * CELL_SIZE, START_POINT.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
-      
     }
   }
+}
+
+function isBorder(inputX, inputY) {
+  if(inputY == MAZE_HEIGHT - 1) return false;
+  if(inputY == 0) return false;
+  if(inputX == MAZE_WIDTH - 1) return false;
+  if(inputX == 0) return false;
+  return true;
+}
+
+const editBtn = document.getElementById('edit');
+const confirmBtn = document.createElement('button');
+let editLastPoint = null;
+let currentMouseMoveCell;
+editBtn.addEventListener('click', function() {
+  confirmBtn.id = 'confirm';
+  confirmBtn.className = 'btn';
+  confirmBtn.style.border = '1px solid #ff0000';
+  confirmBtn.textContent = 'Подтвердить';
+  
+  editBtn.replaceWith(confirmBtn);
+
+  CANVAS.removeEventListener('mousemove', runMouseMoveHandler);
+  CANVAS.removeEventListener('click', runClickHandler);
+  CANVAS.addEventListener('mousemove', editMouseMoveHandler);
+  CANVAS.addEventListener('click', editClickHandler);
 });
 
+function editMouseMoveHandler(event) {
+  const rect = CANVAS.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const mazeX = Math.floor(mouseX / CELL_SIZE);
+  const mazeY = Math.floor(mouseY / CELL_SIZE);
+
+  if (isBorder(mazeX, mazeY)) {
+    if(maze[mazeX][mazeY] == 0) {
+      if(editLastPoint != undefined) {
+        if(mazeX != editLastPoint.x || mazeY != editLastPoint.y) {
+          draw(editLastPoint.x, editLastPoint.y);
+          CTX.drawImage(MOUSEMOVE_EDIT, mazeX * CELL_SIZE, mazeY * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          currentMouseMoveCell = new Point(mazeX, mazeY);
+        }
+      }
+      editLastPoint = new Point(mazeX, mazeY);
+    }
+    else {
+      if(editLastPoint != undefined) {
+        if(mazeX != editLastPoint.x || mazeY != editLastPoint.y) {
+          draw(editLastPoint.x, editLastPoint.y);
+          CTX.drawImage(MOUSEMOVE_EDIT, mazeX * CELL_SIZE, mazeY * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          currentMouseMoveCell = new Point(mazeX, mazeY);
+        }
+      }
+      editLastPoint = new Point(mazeX, mazeY);
+    }
+  }
+}  
+
+function editClickHandler(event) {
+  const rect = CANVAS.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const mazeX = Math.floor(mouseX / CELL_SIZE);
+  const mazeY = Math.floor(mouseY / CELL_SIZE);
+
+  if (isBorder(mazeX, mazeY)) {
+    if(maze[mazeX][mazeY] == 0) {
+      if(editLastPoint != undefined) {
+        maze[mazeX][mazeY] = 1;
+        draw(mazeX, mazeY);
+      }
+      editLastPoint = new Point(mazeX, mazeY);
+    }
+    else {
+      if(editLastPoint != undefined) {
+        maze[mazeX][mazeY] = 0;
+        if(maze[mazeX][mazeY - 1] == 0) {
+          draw(mazeX, mazeY);
+          CTX.drawImage(WALL_IMAGE, mazeX * CELL_SIZE, (mazeY - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        else {
+          draw(mazeX, mazeY);
+        }
+      }
+      editLastPoint = new Point(mazeX, mazeY);
+    }
+  }
+}
+
+confirmBtn.addEventListener('click', function() {
+  CANVAS.removeEventListener('mousemove', editMouseMoveHandler);
+  CANVAS.removeEventListener('click', editClickHandler);
+  CANVAS.addEventListener('mousemove', runMouseMoveHandler);
+  CANVAS.addEventListener('click', runClickHandler);
+  draw(currentMouseMoveCell.x, currentMouseMoveCell.y);
+  confirmBtn.replaceWith(editBtn);
+});
 //
 //------------------------------------------
 //run code
@@ -493,8 +590,9 @@ function getMaze() {
   END_POINT = null;
   lastPoint = null;
   createMaze();
-  for(let x = 0; x < MAZE_WIDTH; x++) {
-    CTX.drawImage(WALL_3D, x * CELL_SIZE, (MAZE_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-  }
+}
+
+function editMaze() {
+  if(maze.length == 0) createMaze();
 }
 //
