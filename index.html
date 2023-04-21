@@ -40,6 +40,12 @@
             <script src="scripts/aStar/aStar.js" defer></script>
             <button id="run" class="btn" onclick="getMaze();">Сгенерировать лабиринт</button>
             <button id="edit" class="btn" onclick="editMaze()">Изменить лабиринт</button>
+            <button id="editStart" class="btn">Изменить точку начала</button>
+            <div class="form-container">
+                <form>
+                    <input type="number" id="mazeSize" name="mazeSize" min="15" max="10000" required>
+                </form>                  
+              </div>
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
