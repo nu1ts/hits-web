@@ -2,6 +2,7 @@
 const CANVAS = document.getElementById("astar-canvas");
 const CTX = CANVAS.getContext("2d");
 const CELL_SIZE  = 16;
+const INPUT = document.getElementById("size");
 let MAZE_WIDTH;
 let MAZE_HEIGHT;
 const INTERVAL_TIME = 5;
@@ -85,9 +86,11 @@ function draw(x, y) {
 //------------------------------------------
 //map
   function createMazeRect() {
+    MAZE_WIDTH = INPUT.value;
+    MAZE_HEIGHT = INPUT.value;
     CANVAS.width = CELL_SIZE * MAZE_WIDTH;
     CANVAS.height = CELL_SIZE * MAZE_HEIGHT
-    
+      
     for (let x = 0; x < MAZE_WIDTH; x++) {
       maze[x] = new Array(MAZE_HEIGHT);
       for (let y = 0; y < MAZE_HEIGHT; y++) {
@@ -521,24 +524,26 @@ const confirmBtn = document.createElement('button');
 let editLastPoint = null;
 let currentMouseMoveCell;
 editBtn.addEventListener('click', function() {
-  confirmBtn.id = 'confirm';
-  confirmBtn.className = 'btn';
-  confirmBtn.style.border = '1px solid #000000';
-  confirmBtn.style.backgroundColor = '#f83e3e'
-  confirmBtn.style.marginRight = '10.3vw';
-  confirmBtn.textContent = 'Подтвердить';
-  
-  editBtn.replaceWith(confirmBtn);
-  
-  CANVAS.removeEventListener('mousemove', runMouseMoveHandler);
-  CANVAS.removeEventListener('click', runClickHandler);
-  CANVAS.addEventListener('mousemove', editMouseMoveHandler);
-  CANVAS.addEventListener('click', editClickHandler);
+  if(INPUT.value != "" && INPUT.value >= 15) {
+    confirmBtn.id = 'confirm';
+    confirmBtn.className = 'btn';
+    confirmBtn.style.border = '1px solid #000000';
+    confirmBtn.style.backgroundColor = '#f83e3e'
+    confirmBtn.style.marginRight = '19.5vw';
+    confirmBtn.textContent = 'Подтвердить';
+    
+    editBtn.replaceWith(confirmBtn);
+    
+    CANVAS.removeEventListener('mousemove', runMouseMoveHandler);
+    CANVAS.removeEventListener('click', runClickHandler);
+    CANVAS.addEventListener('mousemove', editMouseMoveHandler);
+    CANVAS.addEventListener('click', editClickHandler);
 
-  if(lastPoint != undefined) {
-    if(isPathPoint(lastPoint.x, lastPoint.y)) draw(lastPoint.x, lastPoint.y);
+    if(lastPoint != undefined) {
+      if(isPathPoint(lastPoint.x, lastPoint.y)) draw(lastPoint.x, lastPoint.y);
+    }
+    if(editStartBtn.style.backgroundColor == "rgb(125, 184, 255)") editStartBtn.style.backgroundColor = '#eee';
   }
-  if(editStartBtn.style.backgroundColor == "rgb(125, 184, 255)") editStartBtn.style.backgroundColor = '#eee';
 });
 
 function editMouseMoveHandler(event) {
@@ -645,19 +650,31 @@ editStartBtn.addEventListener('click', function() {
 //------------------------------------------
 //run code
 function getMaze() {
+  if(INPUT.value == "") {
+    alert('Введите размер лабиринта!');
+    return;
+  }
+  else if(INPUT.value < 15) {
+    alert('Размер должен быть больше или равен 15!');
+    return;
+  }
   START_POINT = null;
   END_POINT = null;
   lastPoint = null;
-  MAZE_WIDTH = document.getElementById('mazeSize').value;
-  MAZE_HEIGHT = document.getElementById('mazeSize').value;
   editStartBtn.disabled = true;
   runBtn.disabled = true;
   createMaze();
 }
 
 function editMaze() {
-  MAZE_WIDTH = document.getElementById('mazeSize').value;
-  MAZE_HEIGHT = document.getElementById('mazeSize').value;
+  if(INPUT.value == "") {
+    alert('Введите размер лабиринта!');
+    return;
+  }
+  else if(INPUT.value < 15) {
+    alert('Размер должен быть больше или равен 15!');
+    return;
+  }
   if(maze.length == 0) createMaze();
   editStartBtn.disabled = true;
   runBtn.disabled = true;

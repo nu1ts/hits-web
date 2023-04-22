@@ -37,11 +37,11 @@
 }
   
 #astar #edit {
-	margin-right: 10.3vw;
+	margin-right: 19.5vw;
 }
 
 #astar #editStart {
-	margin-right: 18.3vw;
+	margin-right: 27.6vw;
 }
 
 #astar button.btn:focus-visible {
@@ -72,34 +72,35 @@
 	cursor: not-allowed;
 }
 
-#astar form {
+#astar div.input {
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	margin-bottom: 0.6vw;
+	margin-bottom: 0.8vw;
 	margin-right: 10.3vw;
 }
-  
-#astar input[type=number] {
-	display: block;
-	box-sizing: border-box;
-	width: 100%;
-	padding: 0.375rem 0.75rem;
+
+.form-input {
+	font-family: 'Roboto', sans-serif;
+	color: #333;
 	font-size: 1rem;
-	font-weight: 600;
-	line-height: 1.5;
-	color: #495057;
-	background-color: #fff;
-	background-clip: padding-box;
-	border: 1px solid #ced4da;
-	border-radius: 0.25rem;
-	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	margin: 0 auto;
+	padding: 9px;
+	border-radius: 0.2rem;
+	background-color: rgb(255, 255, 255);
+	border: none;
+	width: 90%;
+	display: block;
+	transition: all 0.3s;
 }
-  
-#astar input[type=number]:focus {
-	outline: none;
-	border-color: #7db8ff;
-	box-shadow: 0 0 0 0.2rem rgb(125 184 255 / 25%);
+
+.form-input::placeholder {
+	color: #999;
+	font-style: sans-serif;
+}
+
+input:focus::placeholder {
+	opacity: 0;
 }
 
 #astar-div {
