@@ -13,11 +13,11 @@
         <link rel="stylesheet" href="/scripts/aStar/aStarStyle.css" type="text/css">
         <link rel="stylesheet" href="/scripts/clusteringAlgorithm/clusteringAlgorithm.css" type="text/css">
         <link rel="stylesheet" href="/scripts/antAlgorithm/antAlgorithm.css" type="text/css">
+        <link rel="stylesheet" href="/scripts/geneticAlgorithm/geneticAlgorithm.css" type="text/css">
 
         <!-- scripts -->
         <script src="/scripts/antAlgorithm/antAlgorithm.js"></script>
         <script src="/scripts/decisionTree/decisionTree.js"></script>
-        <script src="/scripts/geneticAlgorithm/geneticAlgorithm.js"></script>
         <script src="/scripts/neuralNetwork/neuralNetwork.js"></script>
     </head>
 
@@ -25,9 +25,9 @@
         <div class="tab", id = "tab">
             <button class="tablinks" onclick="openTab(event, 'astar')"><font color="white">А*</font></button>
             <button class="tablinks" onclick="openTab(event, 'clusteringAlg')"><font color="white">Алгоритм кластеризации</font></button>
-            <button class="tablinks" onclick="openTab(event, '2')"><font color="white">Генетический алгоритм</font></button>
+            <button class="tablinks" onclick="openTab(event, 'genetic')"><font color="white">Генетический алгоритм</font></button>
             <button class="tablinks" onclick="openTab(event, 'antAlg')"><font color="white">Муравьиный алгоритм</font></button>
-            <button class="tablinks" onclick="openTab(event, '4')"><font color="white">Дерево решений</font></button>
+            <!-- <button class="tablinks" onclick="openTab(event, '4')"><font color="white">Дерево решений</font></button> -->
             <button class="tablinks" onclick="openTab(event, '5')"><font color="white">Нейронная сеть</font></button>
         </div>
 
@@ -38,7 +38,12 @@
                 <canvas id="astar-canvas"></canvas>
             </div>
             <script src="scripts/aStar/aStar.js" defer></script>
-            <button class="btn" onclick="getMaze();"><font color="white">Сгенерировать лабиринт</font></button>
+            <button id="run" class="btn" onclick="getMaze();">Сгенерировать лабиринт</button>
+            <button id="edit" class="btn" onclick="editMaze()">Изменить лабиринт</button>
+            <button id="editStart" class="btn">Изменить точку начала</button>
+            <div class="input">
+                <input type="number" class="form-input" id="size" placeholder="Значение" min="15" required="" />
+            </div>
         </div>
 
         <div id="clusteringAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
@@ -48,8 +53,11 @@
             <button class="button-run" onclick="runClusteringAlg()"><font color="white">Запустить</font></button>
         </div>
 
-        <div id="2" class="tab-content">
-            <canvas id = "canvas2", style="border-bottom: 2px solid #000; background-color: rgb(255, 255, 255);" "></canvas>
+        <div id="genetic" class="tab-content", style="background-color: rgb(182, 219, 234);">
+            <div id="genetic-div">
+                <canvas id="genetic-canvas"></canvas>
+            </div>
+            <button id="run" class="btn">Запустить</button>
         </div>
 
         <div id="antAlg" class="tab-content", style="background-color: rgb(182, 219, 234);">
@@ -82,7 +90,7 @@
                     tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }   
                 
-                if (algorithmName != 'astar') document.getElementById(algorithmName).style.display = "inline-block";
+                if (algorithmName != 'astar' && algorithmName != 'genetic') document.getElementById(algorithmName).style.display = "inline-block";
                 else document.getElementById(algorithmName).style.display = "block";
                 evt.currentTarget.className += " active";
             }
