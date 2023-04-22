@@ -89,7 +89,7 @@ function draw(x, y) {
     MAZE_WIDTH = INPUT.value;
     MAZE_HEIGHT = INPUT.value;
     CANVAS.width = CELL_SIZE * MAZE_WIDTH;
-    CANVAS.height = CELL_SIZE * MAZE_HEIGHT
+    CANVAS.height = CELL_SIZE * MAZE_HEIGHT;
       
     for (let x = 0; x < MAZE_WIDTH; x++) {
       maze[x] = new Array(MAZE_HEIGHT);
